@@ -926,8 +926,9 @@
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // ENDPOINTS (rutas relativas — sin dominio expuesto)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const WEBHOOK_POST = '/webhook/tickets-form-webhook-bala-001';
-    const WEBHOOK_STATUS = '/webhook/ticket-status';
+    const N8N_BASE = 'https://n8n.srv1246097.hstgr.cloud';
+    const WEBHOOK_POST   = N8N_BASE + '/webhook/tickets-form-webhook-bala-001';
+    const WEBHOOK_STATUS = N8N_BASE + '/webhook/ticket-status';
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // TYPEWRITER EFFECT
@@ -1263,7 +1264,7 @@
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     (function initPortal() {
       const portal = document.getElementById('access-portal');
-      const AUTH_ENDPOINT = '/webhook/tickets-auth';
+      const AUTH_ENDPOINT = N8N_BASE + '/webhook/tickets-auth';
 
       // Si ya tiene token de sesión válido, saltar portal
       if (sessionStorage.getItem('daat_tk')) {
