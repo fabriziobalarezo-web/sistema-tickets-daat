@@ -1260,16 +1260,23 @@
     updateProgress();
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // PORTAL DE ACCESO — auth vía backend (contraseña nunca en este archivo)
+    // PORTAL DE ACCESO — auth local via SHA-256 (contraseña nunca en este archivo)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     (function initPortal() {
       const portal = document.getElementById('access-portal');
-      const AUTH_ENDPOINT = N8N_BASE + '/webhook/tickets-auth';
+      // SHA-256 de la contraseña — no reversible desde el código fuente
+      const PW_HASH = 'c7e15fe2b5d9e89e80294aa460aa1993a9ec9cebfbe7d7a7f84fec84ccc0b25e';
+      const SESSION_TOKEN = 'DAAT-TK-7X2P9QM';
 
       // Si ya tiene token de sesión válido, saltar portal
-      if (sessionStorage.getItem('daat_tk')) {
+      if (sessionStorage.getItem('daat_tk') === SESSION_TOKEN) {
         portal.style.display = 'none';
         return;
+      }
+
+      async function sha256(str) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
       }
 
       window.attemptAccess = async function () {
@@ -1284,16 +1291,10 @@
         btn.innerHTML = '<div class="spinner" style="border-color:rgba(37,99,235,.3);border-top-color:var(--accent);width:17px;height:17px"></div> Verificando...';
 
         try {
-          const res = await fetch(AUTH_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: val })
-          });
-          const data = await res.json();
-
-          if (data.valid && data.token) {
+          const inputHash = await sha256(val);
+          if (inputHash === PW_HASH) {
             // Guardar token en sessionStorage — contraseña no se almacena
-            sessionStorage.setItem('daat_tk', data.token);
+            sessionStorage.setItem('daat_tk', SESSION_TOKEN);
             errEl.classList.remove('show');
             portal.classList.add('unlocking');
             setTimeout(() => { portal.style.display = 'none'; }, 520);
